@@ -5,6 +5,7 @@ day" mode; tests/test_js_parity.py keeps the two in sync.
 """
 from __future__ import annotations
 
+import math
 from datetime import date, timedelta
 
 from .geo import compass_point, wind_components
@@ -110,6 +111,12 @@ def _public_leg(lr: dict) -> dict:
             for k, v in lr.items() if k not in ("penalty", "exposure_mult")}
 
 
+def _n(x: float, digits: int = 0) -> str:
+    """Round half up for display (matches JavaScript's toFixed on the page)."""
+    f = 10 ** digits
+    return f"{math.floor(x * f + 0.5) / f:.{digits}f}"
+
+
 def explain(r: dict, cfg: dict) -> str:
     """One or two plain-English sentences a rider can read at a glance."""
     th = cfg["thresholds"]
@@ -117,9 +124,9 @@ def explain(r: dict, cfg: dict) -> str:
     ho, hb = r["head_out"], r["head_back"]
     n = NOTABLE_KMH
     if ho >= n and hb <= -n:
-        parts.append(f"Headwind on the way out (~{ho:.0f} km/h), tailwind pushing you home.")
+        parts.append(f"Headwind on the way out (~{_n(ho)} km/h), tailwind pushing you home.")
     elif ho <= -n and hb >= n:
-        parts.append(f"Tailwind out but headwind on the way home (~{hb:.0f} km/h) - a harder finish.")
+        parts.append(f"Tailwind out but headwind on the way home (~{_n(hb)} km/h) - a harder finish.")
     elif max(abs(ho), abs(hb)) < n:
         parts.append("Little head- or tailwind either way.")
     else:
@@ -128,30 +135,30 @@ def explain(r: dict, cfg: dict) -> str:
     c = r["max_cross"]
     stretch = f"{r['worst_cross_leg']} ({r['worst_cross_exposure'].replace('_', ' ')})"
     if c > th["crosswind_caution_kmh"]:
-        parts.append(f"Strong crosswind ~{c:.0f} km/h on {stretch}.")
+        parts.append(f"Strong crosswind ~{_n(c)} km/h on {stretch}.")
     elif c > th["crosswind_free_kmh"]:
-        parts.append(f"Moderate crosswind, worst ~{c:.0f} km/h on {stretch}.")
+        parts.append(f"Moderate crosswind, worst ~{_n(c)} km/h on {stretch}.")
     else:
         parts.append("Crosswinds light.")
 
     g = r["max_gust"]
     if g > th["gust_skip_kmh"]:
-        parts.append(f"Gusts to {g:.0f} km/h - too strong.")
+        parts.append(f"Gusts to {_n(g)} km/h - too strong.")
     elif g > th["gust_penalty_kmh"]:
-        parts.append(f"Gusts to {g:.0f} km/h - stay alert.")
+        parts.append(f"Gusts to {_n(g)} km/h - stay alert.")
     else:
-        parts.append(f"Gusts up to {g:.0f} km/h.")
+        parts.append(f"Gusts up to {_n(g)} km/h.")
     if "heat" in r["flags"]:
-        parts.append(f"Hot: up to {r['max_temp']:.0f}°C.")
+        parts.append(f"Hot: up to {_n(r['max_temp'])}°C.")
     if "dust" in r["flags"]:
-        parts.append(f"Low visibility (dust, haze or fog) ~{r['min_vis'] / 1000:.1f} km.")
+        parts.append(f"Low visibility (dust, haze or fog) ~{_n(r['min_vis'] / 1000, 1)} km.")
     return " ".join(parts)
 
 
 def _ht(h: float) -> str:
     if abs(h) < NOTABLE_KMH:
         return "calm"
-    return f"{'headwind' if h > 0 else 'tailwind'} ~{abs(h):.0f}"
+    return f"{'headwind' if h > 0 else 'tailwind'} ~{_n(abs(h))}"
 
 
 def rank(results: list[dict]) -> list[dict]:
