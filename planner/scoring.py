@@ -11,6 +11,7 @@ from .geo import compass_point, wind_components
 from .weather import circular_mean_deg, grid_key, parse_time, sample, window_hours
 
 STATUS_ORDER = {"good": 0, "caution": 1, "unsafe": 2}
+NOTABLE_KMH = 5  # head/tail winds below this are described as calm
 
 
 def _clamp(x, lo, hi):
@@ -114,11 +115,12 @@ def explain(r: dict, cfg: dict) -> str:
     th = cfg["thresholds"]
     parts = []
     ho, hb = r["head_out"], r["head_back"]
-    if ho >= 3 and hb <= -3:
+    n = NOTABLE_KMH
+    if ho >= n and hb <= -n:
         parts.append(f"Headwind on the way out (~{ho:.0f} km/h), tailwind pushing you home.")
-    elif ho <= -3 and hb >= 3:
+    elif ho <= -n and hb >= n:
         parts.append(f"Tailwind out but headwind on the way home (~{hb:.0f} km/h) - a harder finish.")
-    elif max(abs(ho), abs(hb)) < 3:
+    elif max(abs(ho), abs(hb)) < n:
         parts.append("Little head- or tailwind either way.")
     else:
         parts.append(f"Mixed wind: {_ht(ho)} out, {_ht(hb)} back.")
@@ -142,12 +144,12 @@ def explain(r: dict, cfg: dict) -> str:
     if "heat" in r["flags"]:
         parts.append(f"Hot: up to {r['max_temp']:.0f}°C.")
     if "dust" in r["flags"]:
-        parts.append(f"Dust/low visibility (~{r['min_vis'] / 1000:.1f} km).")
+        parts.append(f"Low visibility (dust, haze or fog) ~{r['min_vis'] / 1000:.1f} km.")
     return " ".join(parts)
 
 
 def _ht(h: float) -> str:
-    if abs(h) < 3:
+    if abs(h) < NOTABLE_KMH:
         return "calm"
     return f"{'headwind' if h > 0 else 'tailwind'} ~{abs(h):.0f}"
 
