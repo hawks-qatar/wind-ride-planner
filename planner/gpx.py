@@ -4,7 +4,7 @@ from __future__ import annotations
 from xml.sax.saxutils import escape, quoteattr
 
 
-def route_to_gpx(route: dict) -> str:
+def route_to_gpx(route: dict, club_name: str = "") -> str:
     name = escape(route["name"])
     desc = escape(f"{route['type'].title()} ride, about {route['distance_km']} km round trip. "
                   "Waypoints are approximate - verify before riding.")
@@ -15,7 +15,8 @@ def route_to_gpx(route: dict) -> str:
         trkpts.append(f"      <trkpt lat={lat} lon={lon}/>")
     return "\n".join([
         '<?xml version="1.0" encoding="UTF-8"?>',
-        '<gpx version="1.1" creator="Wind Ride Planner" xmlns="http://www.topografix.com/GPX/1/1">',
+        f'<gpx version="1.1" creator={quoteattr((club_name + " ").lstrip() + "Wind Ride Planner")} '
+        'xmlns="http://www.topografix.com/GPX/1/1">',
         f"  <metadata><name>{name}</name><desc>{desc}</desc></metadata>",
         "  <rte>",
         f"    <name>{name}</name>",

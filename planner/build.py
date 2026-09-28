@@ -72,7 +72,7 @@ def build(out_dir: Path, days: int, weather_file: Path | None, save_weather: Pat
         d.mkdir(parents=True)
 
     for r in routes:
-        (gpx_dir / f"{r['id']}.gpx").write_text(route_to_gpx(r), encoding="utf-8", newline="\n")
+        (gpx_dir / f"{r['id']}.gpx").write_text(route_to_gpx(r, cfg.get("club_name", "")), encoding="utf-8", newline="\n")
     public_cfg = {k: v for k, v in cfg.items() if not k.startswith("_")}
     (data_dir / "config.json").write_text(json.dumps(public_cfg, indent=1), encoding="utf-8")
     (data_dir / "routes.json").write_text(json.dumps(site_routes(routes, cfg, key), indent=1), encoding="utf-8")

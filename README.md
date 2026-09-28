@@ -1,6 +1,6 @@
-# Wind Ride Planner
+# HAWKS Qatar – Wind Ride Planner
 
-A small web tool for our motorcycle club in Qatar. It checks the wind for the
+A small web tool for the **HAWKS Qatar** motorcycle club. It checks the wind for the
 Tuesday (short) and Saturday (long) rides and recommends the route that
 avoids the worst of it, with two alternates, a map, an "Open in Google
 Maps" button, a GPX download and a WhatsApp-ready summary.
@@ -167,6 +167,7 @@ coordinates inside Qatar, sensible distances, round trips).
 
 | Setting | Default | Meaning |
 |---|---|---|
+| `club_name` | `HAWKS Qatar` | Shown in the page header, WhatsApp text and GPX files |
 | `ride_days.*.window` | `05:30`–`09:30` | Ride window for Tue / Sat (`other_days` for the rest) |
 | `ride_days.*.ride_type` | Tue `short`, Sat `long` | Which route list to use |
 | `average_speed_kmh` | 70 / 75 | Used to estimate when you reach each stretch (include stops) |

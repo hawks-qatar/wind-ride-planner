@@ -289,7 +289,8 @@
 
   function renderWhatsApp(plan) {
     const s = plan.summary, rec = plan.recommended;
-    const lines = [`🏍️ *${plan.weekday} ${nice(plan.date).slice(4)} – ${plan.ride_type === "long" ? "Long" : "Short"} ride* (${plan.window[0]}–${plan.window[1]})`];
+    const club = state.cfg.club_name ? `${state.cfg.club_name} · ` : "";
+    const lines = [`🏍️ *${club}${plan.weekday} ${nice(plan.date).slice(4)} – ${plan.ride_type === "long" ? "Long" : "Short"} ride* (${plan.window[0]}–${plan.window[1]})`];
     if (s) {
       let w = `💨 Wind ${Math.round(s.wind_avg)} km/h from ${s.wind_dir_compass}, gusts to ${Math.round(s.gust_max)} km/h`;
       if (s.temp_max != null) w += `, up to ${Math.round(s.temp_max)}°C`;
@@ -352,6 +353,10 @@
     try {
       const [cfg, routes] = await Promise.all([getJson("data/config.json"), getJson("data/routes.json")]);
       state.cfg = cfg;
+      if (cfg.club_name) {
+        document.title = `${cfg.club_name} Ride Check`;
+        $("club-title").textContent = `${cfg.club_name} Ride Check`;
+      }
       state.routes = routes;
       routes.forEach((r) => { state.routeById[r.id] = r; state.legs[r.id] = P.routeLegs(r); });
     } catch (e) {

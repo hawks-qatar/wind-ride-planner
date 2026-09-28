@@ -5,6 +5,8 @@
     "After editing, rebuild with: .venv\\Scripts\\python -m planner.build --serve"
   ],
 
+  "club_name": "HAWKS Qatar",
+
   "timezone": "Asia/Qatar",
   "utc_offset_hours": 3,
 
