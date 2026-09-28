@@ -106,7 +106,8 @@ def test_plan_day_picks_recommendation_and_two_alternates():
     scores = [plan["recommended"]["score"]] + [a["score"] for a in plan["alternates"]]
     assert scores == sorted(scores, reverse=True)
     assert plan["summary"]["wind_dir_compass"] in ("NNW", "NW")
-    assert [h["time"] for h in plan["hourly"]][0] == "05:00"
+    start_hour = CFG["ride_days"]["saturday"]["window"][0][:2]
+    assert plan["hourly"][0]["time"] == f"{start_hour}:00"
 
 
 def test_plan_day_warns_skip_when_too_windy():

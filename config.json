@@ -11,10 +11,10 @@
   "utc_offset_hours": 3,
 
   "ride_days": {
-    "tuesday":  {"weekday": 1, "ride_type": "short", "window": ["05:30", "09:30"]},
-    "saturday": {"weekday": 5, "ride_type": "long",  "window": ["05:30", "09:30"]}
+    "tuesday":  {"weekday": 1, "ride_type": "short", "window": ["20:00", "23:00"]},
+    "saturday": {"weekday": 5, "ride_type": "long",  "window": ["08:00", "12:00"]}
   },
-  "other_days": {"ride_type": "short", "window": ["05:30", "09:30"]},
+  "other_days": {"ride_type": "short", "window": ["08:00", "12:00"]},
 
   "average_speed_kmh": {
     "_help": "Used to estimate WHEN the group reaches each part of the route (so the way back uses later-hour wind). Include stops.",
