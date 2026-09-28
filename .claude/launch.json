@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wind-ride-planner",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "http.server", "8000", "--directory", "site", "--bind", "127.0.0.1"],
+      "port": 8000
+    }
+  ]
+}

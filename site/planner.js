@@ -238,7 +238,8 @@
 
     const result = {
       id: route.id, name: route.name, type: route.type, distance_km: route.distance_km,
-      score: Math.round(clamp(100 - basePenalty + pattern - extra, 0, 100)), status, flags,
+      score: Math.round(clamp(100 - basePenalty + pattern - extra, 0, 100)),
+      raw_score: r1(100 - basePenalty + pattern - extra), status, flags,
       head_out: r1(headOut), head_back: r1(headBack), max_wind: r1(maxWind), max_gust: r1(maxGust),
       max_cross: r1(Math.abs(worst.cross)), worst_cross_leg: `${worst.from} to ${worst.to}`,
       worst_cross_exposure: worst.exposure,
@@ -285,6 +286,7 @@
       (a.score == null) - (b.score == null) ||
       (STATUS_ORDER[a.status] ?? 3) - (STATUS_ORDER[b.status] ?? 3) ||
       (b.score || 0) - (a.score || 0) ||
+      (b.raw_score || 0) - (a.raw_score || 0) ||
       a.distance_km - b.distance_km);
   }
 

@@ -90,10 +90,11 @@ def score_route(route: dict, legs: list[dict], weather: dict, day: date, window:
     else:
         status = "good"
 
-    score = round(_clamp(100 - base_penalty + pattern - extra, 0, 100))
+    raw = 100 - base_penalty + pattern - extra
     result = {
         "id": route["id"], "name": route["name"], "type": route["type"],
-        "distance_km": route["distance_km"], "score": score, "status": status, "flags": flags,
+        "distance_km": route["distance_km"], "score": round(_clamp(raw, 0, 100)),
+        "raw_score": round(raw, 1), "status": status, "flags": flags,
         "head_out": round(head_out, 1), "head_back": round(head_back, 1),
         "max_wind": round(max_wind, 1), "max_gust": round(max_gust, 1),
         "max_cross": round(abs(worst["cross"]), 1),
@@ -162,9 +163,13 @@ def _ht(h: float) -> str:
 
 
 def rank(results: list[dict]) -> list[dict]:
-    """Safe routes first, then by score (higher is better)."""
+    """Safe routes first, then by score (higher is better).
+
+    The uncapped raw_score breaks ties, so on a calm day where several routes hit
+    100 the one with the best tailwind-home pattern still comes first.
+    """
     return sorted(results, key=lambda r: (r["score"] is None, STATUS_ORDER.get(r["status"], 3),
-                                          -(r["score"] or 0), r["distance_km"]))
+                                          -(r["score"] or 0), -r.get("raw_score", 0), r["distance_km"]))
 
 
 def day_settings(day: date, cfg: dict) -> dict:
