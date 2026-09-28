@@ -1,0 +1,230 @@
+{
+  "_help": [
+    "Route library for the Wind Ride Planner. Edit freely, then run the tests (they validate this file).",
+    "WAYPOINTS ARE APPROXIMATE SUGGESTIONS. Verify every route on a map before publishing.",
+    "Each route is a round trip: the first and last waypoint should be the meeting point.",
+    "type: 'short' (Tuesday, ~60-120 km) or 'long' (Saturday, ~200-350 km).",
+    "distance_km: real road distance of the full loop (measured with OpenStreetMap routing; check in Google Maps).",
+    "waypoints: in riding order. 'exposure' describes the stretch FROM the previous waypoint TO this one:",
+    "  urban | highway | open_desert | coastal | causeway  (multipliers live in config.json).",
+    "Optional per waypoint: 'turnaround': true marks where 'the way out' ends and 'the way back' starts",
+    "  (default: the waypoint farthest from the start). 'key': true keeps the point when Google Maps",
+    "  links are thinned to the waypoint limit - use it for points that force the right road."
+  ],
+  "routes": [
+    {
+      "id": "lusail-north-loop",
+      "name": "Lusail & Northern Loop",
+      "type": "short",
+      "distance_km": 73,
+      "exposure_notes": "Mostly urban and sheltered by buildings; short open stretch on Al Shamal Road back into Doha.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Lusail Expressway", "lat": 25.36, "lon": 51.52, "exposure": "urban"},
+        {"name": "Lusail Boulevard", "lat": 25.4, "lon": 51.515, "exposure": "urban"},
+        {"name": "Lusail Stadium", "lat": 25.4207, "lon": 51.4903, "exposure": "urban"},
+        {"name": "Al Kheesa", "lat": 25.48, "lon": 51.46, "exposure": "highway", "turnaround": true},
+        {"name": "Umm Salal Mohammed", "lat": 25.41, "lon": 51.4, "exposure": "highway", "key": true},
+        {"name": "Al Shamal Rd / Landmark", "lat": 25.33, "lon": 51.45, "exposure": "highway"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "wakra-wukair",
+      "name": "Al Wakra Coast & Al Wukair",
+      "type": "short",
+      "distance_km": 81,
+      "exposure_notes": "Coastal stretch at Al Wakra beach; the rest is suburban highway with some open ground near Al Wukair.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Ras Abu Aboud", "lat": 25.285, "lon": 51.56, "exposure": "urban"},
+        {"name": "Al Wakra Souq", "lat": 25.168, "lon": 51.605, "exposure": "highway", "key": true},
+        {"name": "Al Wakra south beach", "lat": 25.14, "lon": 51.615, "exposure": "coastal", "turnaround": true},
+        {"name": "Al Wukair", "lat": 25.15, "lon": 51.535, "exposure": "open_desert", "key": true},
+        {"name": "Mesaimeer", "lat": 25.225, "lon": 51.48, "exposure": "highway"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "mesaieed-sealine",
+      "name": "Mesaieed & Sealine Beach",
+      "type": "short",
+      "distance_km": 127,
+      "exposure_notes": "Open desert south of Al Wakra and exposed coast at Sealine (sand drift on the road when windy).",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Al Wakra", "lat": 25.168, "lon": 51.6, "exposure": "highway"},
+        {"name": "Mesaieed", "lat": 24.995, "lon": 51.5503, "exposure": "open_desert", "key": true},
+        {"name": "Sealine Beach", "lat": 24.8794, "lon": 51.5266, "exposure": "coastal", "turnaround": true},
+        {"name": "Mesaieed", "lat": 24.995, "lon": 51.5503, "exposure": "coastal"},
+        {"name": "Al Wakra", "lat": 25.168, "lon": 51.6, "exposure": "open_desert"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "highway"}
+      ]
+    },
+    {
+      "id": "simaisma-coast",
+      "name": "Simaisma Coastal Run",
+      "type": "short",
+      "distance_km": 87,
+      "exposure_notes": "Al Khor Coastal Road runs close to the sea north of Lusail; strong sea breezes possible late morning.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Lusail Boulevard", "lat": 25.4, "lon": 51.515, "exposure": "urban"},
+        {"name": "Al Khor Coastal Rd (Al Kheesa)", "lat": 25.4895, "lon": 51.4888, "exposure": "highway", "key": true},
+        {"name": "Simaisma Beach", "lat": 25.575, "lon": 51.485, "exposure": "coastal", "turnaround": true},
+        {"name": "Al Khor Coastal Rd (Al Kheesa)", "lat": 25.4895, "lon": 51.4888, "exposure": "coastal"},
+        {"name": "Lusail Boulevard", "lat": 25.4, "lon": 51.515, "exposure": "highway"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "shahaniya-dukhan-hwy",
+      "name": "Al Shahaniya via Dukhan Highway",
+      "type": "short",
+      "distance_km": 80,
+      "exposure_notes": "Wide open desert west of Al Rayyan: crosswinds from the north (shamal) hit this road side-on.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Al Rayyan", "lat": 25.29, "lon": 51.42, "exposure": "urban"},
+        {"name": "Al Shahaniya (Dukhan Hwy)", "lat": 25.3698, "lon": 51.2198, "exposure": "open_desert", "turnaround": true},
+        {"name": "Al Rayyan", "lat": 25.29, "lon": 51.42, "exposure": "open_desert"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "al-khor-loop",
+      "name": "Al Khor Loop (coast out, Al Shamal Rd back)",
+      "type": "short",
+      "distance_km": 112,
+      "exposure_notes": "Coastal road out to Al Khor, then open desert on Al Shamal Road on the way home.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Lusail Boulevard", "lat": 25.4, "lon": 51.515, "exposure": "urban"},
+        {"name": "Simaisma", "lat": 25.575, "lon": 51.485, "exposure": "coastal", "key": true},
+        {"name": "Al Khor Corniche", "lat": 25.685, "lon": 51.505, "exposure": "coastal", "turnaround": true},
+        {"name": "Al Khor interchange (Al Shamal Rd)", "lat": 25.65, "lon": 51.44, "exposure": "highway", "key": true},
+        {"name": "Umm Salal Mohammed", "lat": 25.41, "lon": 51.4, "exposure": "open_desert"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "highway"}
+      ]
+    },
+    {
+      "id": "shamal-ruwais",
+      "name": "Al Shamal & Al Ruwais",
+      "type": "long",
+      "distance_km": 285,
+      "exposure_notes": "Long open-desert run up Al Shamal Road; exposed coast from Al Ruwais down to Fuwairit.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Lusail Boulevard", "lat": 25.4, "lon": 51.515, "exposure": "urban"},
+        {"name": "Al Khor interchange (Al Shamal Rd)", "lat": 25.65, "lon": 51.44, "exposure": "highway"},
+        {"name": "Al Shamal Rd (Al Ghuwairiya)", "lat": 25.85, "lon": 51.33, "exposure": "open_desert"},
+        {"name": "Madinat ash Shamal", "lat": 26.115, "lon": 51.215, "exposure": "open_desert", "key": true},
+        {"name": "Al Ruwais Port", "lat": 26.14, "lon": 51.21, "exposure": "coastal", "turnaround": true},
+        {"name": "Al Ghariya", "lat": 26.08, "lon": 51.355, "exposure": "coastal"},
+        {"name": "Fuwairit Beach", "lat": 26.03, "lon": 51.37, "exposure": "coastal", "key": true},
+        {"name": "Al Khor Corniche", "lat": 25.69, "lon": 51.505, "exposure": "highway"},
+        {"name": "Umm Salal Mohammed", "lat": 25.41, "lon": 51.4, "exposure": "highway"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "zekreet-dukhan",
+      "name": "Zekreet & Dukhan (West Coast)",
+      "type": "long",
+      "distance_km": 227,
+      "exposure_notes": "Dukhan Highway is flat open desert with nothing to block a crosswind; Zekreet and Dukhan are exposed coast.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Al Rayyan", "lat": 25.29, "lon": 51.42, "exposure": "urban"},
+        {"name": "Al Shahaniya", "lat": 25.37, "lon": 51.22, "exposure": "highway"},
+        {"name": "Dukhan Highway (west)", "lat": 25.4285, "lon": 50.9889, "exposure": "open_desert"},
+        {"name": "Zekreet junction", "lat": 25.44, "lon": 50.9, "exposure": "open_desert", "key": true},
+        {"name": "Zekreet", "lat": 25.48, "lon": 50.845, "exposure": "coastal", "turnaround": true},
+        {"name": "Dukhan", "lat": 25.425, "lon": 50.785, "exposure": "coastal", "key": true},
+        {"name": "Dukhan Highway (west)", "lat": 25.4285, "lon": 50.9889, "exposure": "open_desert"},
+        {"name": "Al Shahaniya", "lat": 25.37, "lon": 51.22, "exposure": "open_desert"},
+        {"name": "Al Rayyan", "lat": 25.29, "lon": 51.42, "exposure": "highway"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "salwa-abu-samra",
+      "name": "Salwa Road to Abu Samra",
+      "type": "long",
+      "distance_km": 254,
+      "exposure_notes": "Salwa Road is open desert almost the whole way, heavy trucks near the border; very exposed to crosswinds.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Salwa Rd (Industrial Area)", "lat": 25.18, "lon": 51.41, "exposure": "urban"},
+        {"name": "Salwa Rd (Mukaynis)", "lat": 25.0824, "lon": 51.1959, "exposure": "open_desert"},
+        {"name": "Al Karaana", "lat": 25.01, "lon": 51.04, "exposure": "open_desert", "key": true},
+        {"name": "Abu Samra", "lat": 24.745, "lon": 50.83, "exposure": "open_desert", "turnaround": true},
+        {"name": "Al Karaana", "lat": 25.01, "lon": 51.04, "exposure": "open_desert"},
+        {"name": "Salwa Rd (Mukaynis)", "lat": 25.0824, "lon": 51.1959, "exposure": "open_desert"},
+        {"name": "Salwa Rd (Industrial Area)", "lat": 25.18, "lon": 51.41, "exposure": "open_desert"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "zubarah-north-coast",
+      "name": "Al Zubarah Fort & North Coast",
+      "type": "long",
+      "distance_km": 347,
+      "exposure_notes": "The longest ride: open desert to Al Zubarah, then exposed north and north-east coast all the way to Al Khor.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Umm Salal Mohammed", "lat": 25.41, "lon": 51.4, "exposure": "highway"},
+        {"name": "Al Khor interchange (Al Shamal Rd)", "lat": 25.65, "lon": 51.44, "exposure": "highway"},
+        {"name": "Al Shamal Rd (Al Ghuwairiya)", "lat": 25.85, "lon": 51.33, "exposure": "open_desert"},
+        {"name": "Al Zubarah Rd junction", "lat": 25.9645, "lon": 51.2679, "exposure": "open_desert", "key": true},
+        {"name": "Al Zubarah Fort", "lat": 25.978, "lon": 51.03, "exposure": "open_desert", "turnaround": true},
+        {"name": "Al Jumail", "lat": 26.0927, "lon": 51.1531, "exposure": "coastal", "key": true},
+        {"name": "Al Ruwais Port", "lat": 26.14, "lon": 51.21, "exposure": "coastal"},
+        {"name": "Fuwairit Beach", "lat": 26.03, "lon": 51.37, "exposure": "coastal", "key": true},
+        {"name": "Al Khor Corniche", "lat": 25.69, "lon": 51.505, "exposure": "highway"},
+        {"name": "Lusail Boulevard", "lat": 25.4, "lon": 51.515, "exposure": "coastal"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "umm-bab-dukhan-loop",
+      "name": "Umm Bab & Dukhan Loop (Salwa out, Dukhan Hwy back)",
+      "type": "long",
+      "distance_km": 277,
+      "exposure_notes": "A full desert loop: Salwa Road out, the Umm Bab-Dukhan coastal road, then Dukhan Highway home. Exposed almost everywhere.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Salwa Rd (Industrial Area)", "lat": 25.18, "lon": 51.41, "exposure": "urban"},
+        {"name": "Salwa Rd (Mukaynis)", "lat": 25.0824, "lon": 51.1959, "exposure": "open_desert"},
+        {"name": "Al Karaana", "lat": 25.01, "lon": 51.04, "exposure": "open_desert"},
+        {"name": "Umm Bab road junction", "lat": 24.952, "lon": 50.912, "exposure": "open_desert", "key": true},
+        {"name": "Umm Bab", "lat": 25.214, "lon": 50.807, "exposure": "open_desert", "turnaround": true},
+        {"name": "Dukhan", "lat": 25.425, "lon": 50.785, "exposure": "coastal", "key": true},
+        {"name": "Dukhan Highway (west)", "lat": 25.4285, "lon": 50.9889, "exposure": "open_desert"},
+        {"name": "Al Shahaniya", "lat": 25.37, "lon": 51.22, "exposure": "open_desert"},
+        {"name": "Al Rayyan", "lat": 25.29, "lon": 51.42, "exposure": "highway"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "urban"}
+      ]
+    },
+    {
+      "id": "thakhira-fuwairit",
+      "name": "Al Thakhira Mangroves & Fuwairit",
+      "type": "long",
+      "distance_km": 239,
+      "exposure_notes": "Coastal road to Al Khor and Al Thakhira, open desert on Al Shamal Road, exposed beach road at Fuwairit.",
+      "waypoints": [
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529},
+        {"name": "Lusail Boulevard", "lat": 25.4, "lon": 51.515, "exposure": "urban"},
+        {"name": "Simaisma", "lat": 25.575, "lon": 51.485, "exposure": "coastal"},
+        {"name": "Al Khor Corniche", "lat": 25.685, "lon": 51.505, "exposure": "coastal"},
+        {"name": "Al Thakhira mangroves", "lat": 25.735, "lon": 51.545, "exposure": "coastal", "key": true},
+        {"name": "Al Shamal Rd (Al Ghuwairiya)", "lat": 25.85, "lon": 51.33, "exposure": "open_desert"},
+        {"name": "Fuwairit Beach", "lat": 26.03, "lon": 51.37, "exposure": "coastal", "turnaround": true},
+        {"name": "Al Shamal Rd (Al Ghuwairiya)", "lat": 25.85, "lon": 51.33, "exposure": "open_desert"},
+        {"name": "Al Khor interchange (Al Shamal Rd)", "lat": 25.65, "lon": 51.44, "exposure": "highway", "key": true},
+        {"name": "Umm Salal Mohammed", "lat": 25.41, "lon": 51.4, "exposure": "open_desert"},
+        {"name": "Doha Corniche (Sheraton Park)", "lat": 25.3183, "lon": 51.529, "exposure": "highway"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "_help": [
+    "All tunable settings for the Wind Ride Planner live in this file.",
+    "Speeds are km/h, temperatures are deg C, visibility is metres, times are Qatar local (HH:MM).",
+    "After editing, rebuild with: .venv\\Scripts\\python -m planner.build --serve"
+  ],
+
+  "club_name": "HAWKS Qatar",
+
+  "timezone": "Asia/Qatar",
+  "utc_offset_hours": 3,
+
+  "ride_days": {
+    "tuesday":  {"weekday": 1, "ride_type": "short", "window": ["05:30", "09:30"]},
+    "saturday": {"weekday": 5, "ride_type": "long",  "window": ["05:30", "09:30"]}
+  },
+  "other_days": {"ride_type": "short", "window": ["05:30", "09:30"]},
+
+  "average_speed_kmh": {
+    "_help": "Used to estimate WHEN the group reaches each part of the route (so the way back uses later-hour wind). Include stops.",
+    "short": 70,
+    "long": 75
+  },
+
+  "thresholds": {
+    "wind_caution_kmh": 25,
+    "wind_skip_kmh": 35,
+    "gust_penalty_kmh": 40,
+    "gust_skip_kmh": 55,
+    "crosswind_free_kmh": 10,
+    "crosswind_caution_kmh": 20,
+    "heat_c": 38,
+    "dust_visibility_m": 5000
+  },
+
+  "weights": {
+    "_help": "How many score points each km/h above its limit costs. Scores start at 100 and are clamped to 0-100.",
+    "crosswind": 1.6,
+    "gust": 1.2,
+    "average_wind": 1.5,
+    "pattern_bonus": 0.5,
+    "pattern_bonus_max": 10,
+    "heat_penalty": 10,
+    "dust_penalty": 15
+  },
+
+  "exposure_multipliers": {
+    "_help": "How much worse a crosswind/gust is on each kind of stretch.",
+    "urban": 0.6,
+    "highway": 1.0,
+    "open_desert": 1.3,
+    "coastal": 1.4,
+    "causeway": 1.6
+  },
+
+  "weather": {
+    "forecast_days_prebuilt": 7,
+    "max_forecast_days": 16,
+    "grid_deg": 0.1,
+    "api_url": "https://api.open-meteo.com/v1/forecast"
+  },
+
+  "live_refresh_after_hours": 6,
+
+  "google_maps": {
+    "max_waypoints": 8,
+    "embed_api_key_env": "GOOGLE_MAPS_EMBED_KEY"
+  },
+
+  "alternates": 2
+}
