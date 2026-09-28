@@ -231,28 +231,29 @@
       if (state.map) { state.map.remove(); state.map = null; }
       holder.innerHTML = "";
       const map = L.map(holder, { scrollWheelZoom: false, attributionControl: true });
+      // OpenStreetMap tiles, darkened in CSS (.leaflet-tile-pane) to match the club theme.
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(map);
       const latlngs = route.waypoints.map((w) => [w.lat, w.lon]);
       const turn = P.turnaroundIndex(route.waypoints);
-      const brand = getComputedStyle(document.documentElement).getPropertyValue("--brand").trim() || "#0f766e";
+      const brand = getComputedStyle(document.documentElement).getPropertyValue("--route").trim() || "#e0232e";
       L.polyline(latlngs.slice(0, turn + 1), { color: brand, weight: 5, opacity: 0.9 }).addTo(map).bindTooltip("Way out");
       L.polyline(latlngs.slice(turn), { color: brand, weight: 5, opacity: 0.55, dashArray: "8 8" }).addTo(map).bindTooltip("Way back");
       route.waypoints.forEach((w, i) => {
         if (i === 0 || i === route.waypoints.length - 1 || i === turn) return;
-        L.circleMarker([w.lat, w.lon], { radius: 4, color: brand, weight: 2, fillColor: "#fff", fillOpacity: 1 }).addTo(map).bindTooltip(esc(w.name));
+        L.circleMarker([w.lat, w.lon], { radius: 4, color: brand, weight: 2, fillColor: "#000", fillOpacity: 1 }).addTo(map).bindTooltip(esc(w.name));
       });
       const start = route.waypoints[0], end = route.waypoints[route.waypoints.length - 1], far = route.waypoints[turn];
       const sameEnd = start.lat === end.lat && start.lon === end.lon;
-      L.circleMarker([start.lat, start.lon], { radius: 9, color: "#fff", weight: 3, fillColor: "#15803d", fillOpacity: 1 })
+      L.circleMarker([start.lat, start.lon], { radius: 9, color: "#fff", weight: 3, fillColor: "#16a34a", fillOpacity: 1 })
         .addTo(map).bindTooltip(sameEnd ? "Start / Finish" : "Start", { permanent: true, direction: "right" })
         .bindPopup(esc(start.name));
       if (!sameEnd) {
         L.circleMarker([end.lat, end.lon], { radius: 9, color: "#fff", weight: 3, fillColor: "#b91c1c", fillOpacity: 1 })
           .addTo(map).bindTooltip("Finish", { permanent: true, direction: "right" }).bindPopup(esc(end.name));
       }
-      L.circleMarker([far.lat, far.lon], { radius: 8, color: "#fff", weight: 3, fillColor: "#b45309", fillOpacity: 1 })
+      L.circleMarker([far.lat, far.lon], { radius: 8, color: "#fff", weight: 3, fillColor: "#f59e0b", fillOpacity: 1 })
         .addTo(map).bindTooltip("Turnaround", { permanent: true, direction: "left" }).bindPopup(esc(far.name));
       map.fitBounds(L.latLngBounds(latlngs), { padding: [95, 30] });
       state.map = map;
@@ -355,7 +356,6 @@
       state.cfg = cfg;
       if (cfg.club_name) {
         document.title = `${cfg.club_name} Ride Check`;
-        $("club-title").textContent = `${cfg.club_name} Ride Check`;
       }
       state.routes = routes;
       routes.forEach((r) => { state.routeById[r.id] = r; state.legs[r.id] = P.routeLegs(r); });

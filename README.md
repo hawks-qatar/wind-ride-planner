@@ -5,6 +5,8 @@ Tuesday (short) and Saturday (long) rides and recommends the route that
 avoids the worst of it, with two alternates, a map, an "Open in Google
 Maps" button, a GPX download and a WhatsApp-ready summary.
 
+**Live site: <https://hawks-qatar.github.io/wind-ride-planner/>**
+
 Club members just open the public link on their phone. No account or app is
 needed.
 
@@ -20,7 +22,7 @@ needed.
 | | |
 |---|---|
 | **Days** | Tuesday = short ride (60–120 km), Saturday = long ride (200–350 km). Any other day can be checked too. |
-| **Ride window** | 05:30–09:30 Qatar time by default (set in `config.json`). |
+| **Ride window** | Saturday 08:00–12:00 and Tuesday 20:00–23:00 Qatar time, matching the club calendar (set in `config.json`). |
 | **Weather** | [Open-Meteo](https://open-meteo.com/) (free, no key): hourly wind speed, direction, gusts, temperature, visibility. |
 | **Where** | Wind is sampled all along every route (about 36 points on an ~11 km grid), not just Doha, so Al Shamal, Dukhan and Mesaieed are each looked up separately. |
 | **Output** | Recommended route and 2 alternates with plain-English reasons, wind arrow, hourly chart, map, Google Maps link, GPX, WhatsApp text. |
@@ -149,7 +151,7 @@ Each route looks like this:
 * **id**: unique, lowercase, dashes (used for the GPX file name).
 * **type**: `short` or `long`.
 * **distance_km**: the real road distance of the whole loop. Measure it in Google Maps.
-* **waypoints**: in riding order, starting and ending at the meeting point.
+* **waypoints**: in riding order, starting and ending at the meeting point (Mondrian Doha).
   * **exposure**: describes the stretch *from the previous waypoint to this one*:
     `urban`, `highway`, `open_desert`, `coastal` or `causeway`.
   * **turnaround**: `true` on the point where "the way out" ends. If it's missing,
@@ -168,7 +170,7 @@ coordinates inside Qatar, sensible distances, round trips).
 | Setting | Default | Meaning |
 |---|---|---|
 | `club_name` | `HAWKS Qatar` | Shown in the page header, WhatsApp text and GPX files |
-| `ride_days.*.window` | `05:30`–`09:30` | Ride window for Tue / Sat (`other_days` for the rest) |
+| `ride_days.*.window` | Tue `20:00`–`23:00`, Sat `08:00`–`12:00` | Ride window (`other_days` for the rest: `08:00`–`12:00`) |
 | `ride_days.*.ride_type` | Tue `short`, Sat `long` | Which route list to use |
 | `average_speed_kmh` | 70 / 75 | Used to estimate when you reach each stretch (include stops) |
 | `thresholds.wind_caution_kmh` | 25 | Average wind above this costs points and triggers "caution" |
@@ -215,7 +217,7 @@ normal for the Embed API, but you must restrict it so only your site can use it.
 5. *APIs & Services → Credentials* → **Create credentials → API key**. Copy it.
 6. Click the new key to edit it:
    * **Application restrictions → Websites (HTTP referrers)**, add:
-     * `https://<your-github-username>.github.io/wind-ride-planner/*`
+     * `https://hawks-qatar.github.io/wind-ride-planner/*`
      * `http://localhost:8000/*` (only if you want the Google map in local previews)
    * **API restrictions → Restrict key →** tick only **Maps Embed API**.
    * **Save.** (Changes can take a few minutes to apply.)
@@ -235,7 +237,7 @@ Never commit the key to the repository.
 2. *Settings → Pages → Build and deployment → Source:* **GitHub Actions**.
 3. (Optional) add the `GOOGLE_MAPS_EMBED_KEY` secret as above.
 4. *Actions → Build and deploy → Run workflow* to publish the first time.
-5. The site appears at `https://<your-github-username>.github.io/wind-ride-planner/`.
+5. The site appears at **<https://hawks-qatar.github.io/wind-ride-planner/>**.
 
 After that the workflow runs on its own **every Tuesday and Saturday at 03:00 UTC
 (06:00 Qatar)**. Pull requests run the tests only; they don't deploy.

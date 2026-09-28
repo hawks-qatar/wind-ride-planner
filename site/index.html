@@ -5,17 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>HAWKS Qatar Ride Check</title>
   <meta name="description" content="HAWKS Qatar: wind-aware ride route recommendations for the club's Tuesday and Saturday rides in Qatar.">
-  <meta name="theme-color" content="#0f766e">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="website">
   <meta property="og:title" content="HAWKS Qatar Ride Check">
   <meta property="og:description" content="Today's wind and the best ride route for the Tuesday and Saturday club rides.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 11h16a4 4 0 1 0-4-4M4 17h22a4 4 0 1 1-4 4M4 23h10' fill='none' stroke='%230f766e' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta property="og:image" content="https://hawks-qatar.github.io/wind-ride-planner/assets/og-image.jpg">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;700&family=Pirata+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="top">
     <div class="wrap">
-      <h1 id="club-title">HAWKS Qatar Ride Check</h1>
-      <p class="sub">Wind check &middot; Tuesday short &middot; Saturday long</p>
+      <img class="logo" src="assets/hawks-logo.png" width="640" height="640" alt="HAWKS Qatar MC logo">
+      <h1 id="club-title" class="gothic">Ride Wind Check</h1>
+      <p class="sub gothic">Tuesday Short &nbsp;&amp;&nbsp; Saturday Long</p>
     </div>
   </header>
 
@@ -47,7 +55,7 @@
       <section class="card wind" aria-label="Wind during the ride window">
         <div class="wind-head">
           <div>
-            <h2 id="day-title"></h2>
+            <h2 id="day-title" class="gothic"></h2>
             <p class="muted" id="day-sub"></p>
           </div>
           <svg class="arrow" id="wind-arrow" viewBox="-50 -50 100 100" role="img" aria-label="Wind direction">
@@ -63,7 +71,7 @@
           <div><dt>Max temp</dt><dd id="s-temp"></dd></div>
           <div><dt>Visibility</dt><dd id="s-vis"></dd></div>
         </dl>
-        <h3 class="mini-title">Hour by hour (ride window)</h3>
+        <h3 class="mini-title gothic">Hour by Hour</h3>
         <div id="chart" class="chart"></div>
       </section>
 
@@ -78,12 +86,12 @@
       </section>
 
       <section aria-label="Alternate routes">
-        <h2 class="section-title">Alternates</h2>
+        <h2 class="section-title gothic">Alternates</h2>
         <div id="alts"></div>
       </section>
 
       <section class="card" aria-label="WhatsApp summary">
-        <h2>Share with the group</h2>
+        <h2 class="gothic">Share with the group</h2>
         <textarea id="wa-text" rows="9" readonly></textarea>
         <div class="btns">
           <button type="button" class="btn primary" id="copy">Copy text</button>
@@ -114,6 +122,7 @@
   </main>
 
   <footer class="wrap foot">
+    <p class="gothic foot-brand">HAWKS Qatar MC &middot; Ride Safe</p>
     <p>Forecast: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>. Route waypoints are approximate &mdash; always check the road and conditions yourself. Ride safe.</p>
     <p id="generated"></p>
   </footer>
