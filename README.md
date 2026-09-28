@@ -5,6 +5,8 @@ Tuesday (short) and Saturday (long) rides and recommends the route that
 avoids the worst of it, with two alternates, a map, an "Open in Google
 Maps" button, a GPX download and a WhatsApp-ready summary.
 
+**Live site: <https://hawks-qatar.github.io/wind-ride-planner/>**
+
 Club members just open the public link on their phone. No account or app is
 needed.
 
@@ -215,7 +217,7 @@ normal for the Embed API, but you must restrict it so only your site can use it.
 5. *APIs & Services → Credentials* → **Create credentials → API key**. Copy it.
 6. Click the new key to edit it:
    * **Application restrictions → Websites (HTTP referrers)**, add:
-     * `https://<your-github-username>.github.io/wind-ride-planner/*`
+     * `https://hawks-qatar.github.io/wind-ride-planner/*`
      * `http://localhost:8000/*` (only if you want the Google map in local previews)
    * **API restrictions → Restrict key →** tick only **Maps Embed API**.
    * **Save.** (Changes can take a few minutes to apply.)
@@ -235,7 +237,7 @@ Never commit the key to the repository.
 2. *Settings → Pages → Build and deployment → Source:* **GitHub Actions**.
 3. (Optional) add the `GOOGLE_MAPS_EMBED_KEY` secret as above.
 4. *Actions → Build and deploy → Run workflow* to publish the first time.
-5. The site appears at `https://<your-github-username>.github.io/wind-ride-planner/`.
+5. The site appears at **<https://hawks-qatar.github.io/wind-ride-planner/>**.
 
 After that the workflow runs on its own **every Tuesday and Saturday at 03:00 UTC
 (06:00 Qatar)**. Pull requests run the tests only; they don't deploy.
