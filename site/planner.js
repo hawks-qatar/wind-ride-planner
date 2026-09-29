@@ -293,21 +293,26 @@
   const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   function weekdayOf(day) { return parseTime(day, "00:00").getUTCDay(); }
 
+  const SESSIONS = ["morning", "evening"];
+  const sessionWindow = (session, cfg) => cfg.sessions[session].window;
+
   function daySettings(day, cfg) {
     const pyWeekday = (weekdayOf(day) + 6) % 7; // Python: Monday = 0
-    for (const rd of Object.values(cfg.ride_days)) {
-      if (rd.weekday === pyWeekday) return { ride_type: rd.ride_type, window: rd.window, club_day: true };
+    let chosen = cfg.other_days, club = false;
+    for (const [key, rd] of Object.entries(cfg.ride_days)) {
+      if (!key.startsWith("_") && rd.weekday === pyWeekday) { chosen = rd; club = true; break; }
     }
-    return { ride_type: cfg.other_days.ride_type, window: cfg.other_days.window, club_day: false };
+    return { ride_type: chosen.ride_type, session: chosen.session, window: sessionWindow(chosen.session, cfg), club_day: club };
   }
 
-  function planDay(day, rideType, routes, legsByRoute, weather, cfg) {
-    const window = daySettings(day, cfg).window;
+  function planDay(day, rideType, routes, legsByRoute, weather, cfg, session) {
+    session = session || daySettings(day, cfg).session;
+    const window = sessionWindow(session, cfg);
     const scored = rank(routes.filter((r) => r.type === rideType)
       .map((r) => scoreRoute(r, legsByRoute[r.id], weather, day, window, cfg)));
     const usable = scored.filter((r) => r.score != null);
     const plan = {
-      date: day, weekday: WEEKDAYS[weekdayOf(day)], ride_type: rideType, window, routes: scored,
+      date: day, weekday: WEEKDAYS[weekdayOf(day)], ride_type: rideType, session, window, routes: scored,
       recommended: usable[0] || null,
       alternates: usable.slice(1, 1 + (cfg.alternates ?? 2)),
       hourly: usable.length ? hourlySummary(day, window, usable[0], legsByRoute, weather, cfg) : [],
@@ -357,7 +362,7 @@
   const api = {
     haversineKm, bearingDeg, windComponents, compassPoint, turnaroundIndex, routeLegs,
     gridKey, collectPoints, buildRequestUrl, parseResponse, fetchForecast, sample, windowHours,
-    scoreRoute, explain, rank, daySettings, planDay,
+    scoreRoute, explain, rank, daySettings, planDay, SESSIONS, sessionWindow,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.Planner = api;

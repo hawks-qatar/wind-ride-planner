@@ -5,7 +5,7 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  const state = { cfg: null, routes: [], routeById: {}, legs: {}, forecast: null, live: {}, date: null, type: null, map: null };
+  const state = { cfg: null, routes: [], routeById: {}, legs: {}, forecast: null, live: {}, date: null, type: null, session: null, map: null };
   const STATUS_TEXT = { good: "Good to ride", caution: "Ride with care", unsafe: "Skip or ride short", no_data: "No forecast yet" };
   const FLAG_TEXT = { heat: "Heat", dust: "Low visibility", high_wind: "High wind" };
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -47,11 +47,11 @@
     return r.json();
   }
 
-  function prebuilt(date, type) {
+  function prebuilt(date, type, session) {
     const f = state.forecast;
     if (!f || !f.days) return null;
     const day = f.days.find((d) => d.date === date);
-    return day ? day.plans[type] : null;
+    return day && day.plans[session] ? day.plans[session][type] : null;
   }
 
   function prebuiltIsFresh() {
@@ -61,27 +61,30 @@
     return ageH < state.cfg.live_refresh_after_hours;
   }
 
-  async function livePlan(date, type) {
+  async function livePlan(date, type, session) {
     if (!state.live[date]) {
       const points = P.collectPoints(state.legs, state.cfg.weather.grid_deg);
-      state.live[date] = P.fetchForecast(points, date, date, state.cfg);
+      // Include the next day too (evening rides can run past midnight), within Open-Meteo's range.
+      const lastDay = addDays(iso(qatarNow()), state.cfg.weather.max_forecast_days - 1);
+      const end = addDays(date, 1) <= lastDay ? addDays(date, 1) : date;
+      state.live[date] = P.fetchForecast(points, date, end, state.cfg);
     }
     try {
       const wx = await state.live[date];
-      return P.planDay(date, type, state.routes, state.legs, wx, state.cfg);
+      return P.planDay(date, type, state.routes, state.legs, wx, state.cfg, session);
     } catch (e) {
       delete state.live[date];
       throw e;
     }
   }
 
-  async function getPlan(date, type, forceLive) {
-    const saved = prebuilt(date, type);
+  async function getPlan(date, type, session, forceLive) {
+    const saved = prebuilt(date, type, session);
     if (saved && prebuiltIsFresh() && !forceLive) {
       return { plan: saved, source: `Forecast from ${fmtStamp(state.forecast.generated_at)}.`, canRefresh: true };
     }
     try {
-      const plan = await livePlan(date, type);
+      const plan = await livePlan(date, type, session);
       return { plan, source: "Live forecast from Open-Meteo, just now." };
     } catch (e) {
       if (saved) return { plan: saved, source: `Couldn't refresh (offline?). Showing forecast from ${fmtStamp(state.forecast.generated_at)}.` };
@@ -150,7 +153,7 @@
     banner.innerHTML = `<strong>${STATUS_TEXT[plan.status] || ""}</strong>${esc(plan.advice || (rec ? `Recommended: ${rec.name}.` : ""))}`;
 
     $("day-title").textContent = `${plan.weekday} ${nice(plan.date).slice(4)}`;
-    $("day-sub").textContent = `${plan.ride_type === "long" ? "Long ride" : "Short ride"} · ${plan.window[0]}–${plan.window[1]}`;
+    $("day-sub").textContent = `${plan.ride_type === "long" ? "Long ride" : "Short ride"} · ${sessionLabel(plan.session)} ${plan.window[0]}–${plan.window[1]}`;
 
     const s = plan.summary;
     $("s-wind").textContent = s ? kmh(s.wind_avg) : "–";
@@ -280,10 +283,15 @@
     return leafletPromise;
   }
 
+  function sessionLabel(session) {
+    const s = state.cfg.sessions[session];
+    return s ? s.label : "";
+  }
+
   // ---------- WhatsApp ----------
   function pageLink(plan) {
     const u = new URL(location.href);
-    u.search = `?date=${plan.date}&type=${plan.ride_type}`;
+    u.search = `?date=${plan.date}&type=${plan.ride_type}&time=${plan.session}`;
     u.hash = "";
     return u.toString();
   }
@@ -291,7 +299,7 @@
   function renderWhatsApp(plan) {
     const s = plan.summary, rec = plan.recommended;
     const club = state.cfg.club_name ? `${state.cfg.club_name} · ` : "";
-    const lines = [`🏍️ *${club}${plan.weekday} ${nice(plan.date).slice(4)} – ${plan.ride_type === "long" ? "Long" : "Short"} ride* (${plan.window[0]}–${plan.window[1]})`];
+    const lines = [`🏍️ *${club}${plan.weekday} ${nice(plan.date).slice(4)} – ${plan.ride_type === "long" ? "Long" : "Short"} ride, ${sessionLabel(plan.session).toLowerCase()}* (${plan.window[0]}–${plan.window[1]})`];
     if (s) {
       let w = `💨 Wind ${Math.round(s.wind_avg)} km/h from ${s.wind_dir_compass}, gusts to ${Math.round(s.gust_max)} km/h`;
       if (s.temp_max != null) w += `, up to ${Math.round(s.temp_max)}°C`;
@@ -313,31 +321,41 @@
   }
 
   // ---------- controls ----------
-  function setType(type) {
-    state.type = type;
-    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.type === type)));
+  function syncSwitches() {
+    document.querySelectorAll(".seg button[data-type]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.type === state.type)));
+    document.querySelectorAll(".seg button[data-session]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.session === state.session)));
+  }
+
+  function useDefaults(date) {
+    const d = P.daySettings(date, state.cfg);
+    state.date = date;
+    state.type = d.ride_type;
+    state.session = d.session;
   }
 
   function renderQuick() {
     const today = iso(qatarNow());
     const chips = [
-      ["Next Tuesday", nextClubDay(today, 1), "short"],
-      ["Next Saturday", nextClubDay(today, 5), "long"],
-      ["Tomorrow", addDays(today, 1), null],
+      ["Next Tuesday", nextClubDay(today, 1)],
+      ["Next Saturday", nextClubDay(today, 5)],
+      ["Tomorrow", addDays(today, 1)],
     ].filter((c, i, all) => all.findIndex((o) => o[1] === c[1]) === i);
-    $("quick").innerHTML = chips.map(([label, d, t]) =>
-      `<button type="button" class="chip" data-date="${d}" data-type="${t || ""}" aria-pressed="${d === state.date && (!t || t === state.type)}">${label} <span class="muted">${nice(d).slice(4)}</span></button>`).join("");
+    $("quick").innerHTML = chips.map(([label, d]) => {
+      const def = P.daySettings(d, state.cfg);
+      const on = d === state.date && def.ride_type === state.type && def.session === state.session;
+      return `<button type="button" class="chip" data-date="${d}" aria-pressed="${on}">${label} <span class="muted">${nice(d).slice(4)}</span></button>`;
+    }).join("");
   }
 
   async function update(opts = {}) {
     const { forceLive = false, pushUrl = true } = opts;
     $("date").value = state.date;
-    setType(state.type);
+    syncSwitches();
     renderQuick();
-    if (pushUrl) history.replaceState(null, "", `?date=${state.date}&type=${state.type}`);
+    if (pushUrl) history.replaceState(null, "", `?date=${state.date}&type=${state.type}&time=${state.session}`);
     $("loading").hidden = false;
     try {
-      const { plan, source, canRefresh } = await getPlan(state.date, state.type, forceLive);
+      const { plan, source, canRefresh } = await getPlan(state.date, state.type, state.session, forceLive);
       const extra = canRefresh ? ` <button type="button" id="refresh">Refresh live</button>` : "";
       render(plan, esc(source) + extra);
       const btn = document.getElementById("refresh");
@@ -373,22 +391,22 @@
 
     const params = new URLSearchParams(location.search);
     const pDate = params.get("date");
-    state.date = pDate && /^\d{4}-\d{2}-\d{2}$/.test(pDate) && pDate >= today && pDate <= maxDay ? pDate : nextClubDay(today);
-    const pType = params.get("type");
-    state.type = pType === "short" || pType === "long" ? pType : P.daySettings(state.date, state.cfg).ride_type;
+    useDefaults(pDate && /^\d{4}-\d{2}-\d{2}$/.test(pDate) && pDate >= today && pDate <= maxDay ? pDate : nextClubDay(today));
+    const pType = params.get("type"), pTime = params.get("time");
+    if (pType === "short" || pType === "long") state.type = pType;
+    if (P.SESSIONS.includes(pTime)) state.session = pTime;
 
     $("date").addEventListener("change", () => {
       if (!$("date").value) return;
-      state.date = $("date").value;
-      state.type = P.daySettings(state.date, state.cfg).ride_type;
+      useDefaults($("date").value);
       update();
     });
-    document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => { state.type = b.dataset.type; update(); }));
+    document.querySelectorAll(".seg button[data-type]").forEach((b) => b.addEventListener("click", () => { state.type = b.dataset.type; update(); }));
+    document.querySelectorAll(".seg button[data-session]").forEach((b) => b.addEventListener("click", () => { state.session = b.dataset.session; update(); }));
     $("quick").addEventListener("click", (ev) => {
       const chip = ev.target.closest(".chip");
       if (!chip) return;
-      state.date = chip.dataset.date;
-      state.type = chip.dataset.type || P.daySettings(state.date, state.cfg).ride_type;
+      useDefaults(chip.dataset.date);
       update();
     });
     $("copy").addEventListener("click", async () => {

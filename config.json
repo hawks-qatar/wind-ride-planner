@@ -10,11 +10,18 @@
   "timezone": "Asia/Qatar",
   "utc_offset_hours": 3,
 
-  "ride_days": {
-    "tuesday":  {"weekday": 1, "ride_type": "short", "window": ["20:00", "23:00"]},
-    "saturday": {"weekday": 5, "ride_type": "long",  "window": ["08:00", "12:00"]}
+  "sessions": {
+    "_help": "Every day can be checked for either session; the page has a Morning / Evening switch.",
+    "morning": {"label": "Morning", "window": ["08:00", "12:00"]},
+    "evening": {"label": "Evening", "window": ["20:00", "23:00"]}
   },
-  "other_days": {"ride_type": "short", "window": ["08:00", "12:00"]},
+
+  "ride_days": {
+    "_help": "Defaults the page opens with for club ride days (weekday: Monday = 0). Riders can still switch.",
+    "tuesday":  {"weekday": 1, "ride_type": "short", "session": "evening"},
+    "saturday": {"weekday": 5, "ride_type": "long",  "session": "morning"}
+  },
+  "other_days": {"ride_type": "short", "session": "morning"},
 
   "average_speed_kmh": {
     "_help": "Used to estimate WHEN the group reaches each part of the route (so the way back uses later-hour wind). Include stops.",

@@ -24,7 +24,7 @@ from pathlib import Path
 from .gmaps import directions_url, embed_url
 from .gpx import route_to_gpx
 from .routes import load_routes, route_legs
-from .scoring import day_settings, plan_day
+from .scoring import SESSIONS, day_settings, plan_day
 from .weather import collect_points, fetch_forecast
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,6 +80,7 @@ def build(out_dir: Path, days: int, weather_file: Path | None, save_weather: Pat
     now = datetime.now(timezone(timedelta(hours=cfg["utc_offset_hours"])))
     today = now.date()
     end = today + timedelta(days=days - 1)
+    fetch_end = end + timedelta(days=1)  # evening rides can run past midnight
     forecast = {"generated_at": now.isoformat(timespec="minutes"), "timezone": cfg["timezone"],
                 "has_embed_key": bool(key), "days": [], "error": None}
     try:
@@ -88,7 +89,7 @@ def build(out_dir: Path, days: int, weather_file: Path | None, save_weather: Pat
         else:
             points = collect_points(legs, cfg["weather"]["grid_deg"])
             print(f"Fetching Open-Meteo forecast for {len(points)} grid points, {today} to {end} ...")
-            weather = fetch_forecast(points, today, end, cfg)
+            weather = fetch_forecast(points, today, fetch_end, cfg)
         if save_weather:
             save_weather.write_text(json.dumps(weather), encoding="utf-8")
         d = today
@@ -96,14 +97,30 @@ def build(out_dir: Path, days: int, weather_file: Path | None, save_weather: Pat
             settings = day_settings(d, cfg)
             forecast["days"].append({
                 "date": d.isoformat(), "weekday": d.strftime("%A"), **settings,
-                "plans": {t: plan_day(d, t, routes, legs, weather, cfg) for t in ("short", "long")},
+                "plans": {s: {t: plan_day(d, t, routes, legs, weather, cfg, s) for t in ("short", "long")}
+                          for s in SESSIONS},
             })
             d += timedelta(days=1)
     except Exception as exc:  # keep the site usable (it can still fetch live in the browser)
         forecast["error"] = f"{type(exc).__name__}: {exc}"
         print(f"WARNING: forecast failed: {forecast['error']}", file=sys.stderr)
 
-    (data_dir / "forecast.json").write_text(json.dumps(forecast, indent=1), encoding="utf-8")
+    (data_dir / "forecast.json").write_text(json.dumps(_slim(forecast), separators=(",", ":")), encoding="utf-8")
+    return forecast
+
+
+def _slim(forecast: dict) -> dict:
+    """Drop per-leg detail from the published forecast; the page doesn't use it (keeps the file small)."""
+    def strip(r):
+        return {k: v for k, v in r.items() if k != "legs"} if r else r
+    for day in forecast["days"]:
+        for plans in day["plans"].values():
+            for plan in plans.values():
+                plan["routes"] = [strip(r) for r in plan["routes"]]
+                plan["recommended"] = strip(plan["recommended"])
+                plan["alternates"] = [strip(r) for r in plan["alternates"]]
+                if plan.get("short_fallback"):
+                    plan["short_fallback"] = strip(plan["short_fallback"])
     return forecast
 
 
@@ -131,10 +148,10 @@ def main(argv=None) -> int:
     days = args.days or cfg["weather"]["forecast_days_prebuilt"]
     forecast = build(args.out, days, args.weather_file, args.save_weather)
     for day in forecast["days"]:
-        plan = day["plans"][day["ride_type"]]
+        plan = day["plans"][day["session"]][day["ride_type"]]
         top = plan["recommended"]
         label = f"{top['name']} ({top['score']}, {top['status']})" if top else plan["advice"]
-        print(f"  {day['date']} {day['weekday'][:3]} {day['ride_type']:5} -> {label}")
+        print(f"  {day['date']} {day['weekday'][:3]} {day['session']:7} {day['ride_type']:5} -> {label}")
     if args.serve:
         serve(args.out, args.port)
     return 1 if forecast["error"] else 0
