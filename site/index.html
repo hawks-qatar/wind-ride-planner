@@ -15,15 +15,20 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;700&family=Pirata+One&display=swap" rel="stylesheet">
+  <!-- Brand fonts (HAWKS Brand Manual): Godhong Professional (primary, used if installed or added to assets/fonts),
+       Kohinoor (secondary; Hind is ITF's open web version of it). Pirata One is the closest free stand-in for Godhong. -->
+  <link href="https://fonts.googleapis.com/css2?family=Hind:wght@300;400;600;700&family=Pirata+One&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="top">
-    <div class="wrap">
-      <img class="logo" src="assets/hawks-logo.png" width="640" height="640" alt="HAWKS Qatar MC logo">
+    <div class="wrap brandbar">
+      <p class="kicker">Hawks Qatar MC</p>
+      <p class="kicker-sub"><b>Wind Ride Planner</b><br>Tuesday short &middot; Saturday long</p>
+    </div>
+    <div class="wrap hero">
+      <img class="logo" src="assets/hawks-logo.webp" width="1667" height="2000" alt="HAWKS Qatar MC logo">
       <h1 id="club-title" class="gothic">Ride Wind Check</h1>
-      <p class="sub gothic">Tuesday Short &nbsp;&amp;&nbsp; Saturday Long</p>
     </div>
   </header>
 
@@ -71,7 +76,7 @@
           <div><dt>Max temp</dt><dd id="s-temp"></dd></div>
           <div><dt>Visibility</dt><dd id="s-vis"></dd></div>
         </dl>
-        <h3 class="mini-title gothic">Hour by Hour</h3>
+        <h3 class="label">Hour by hour</h3>
         <div id="chart" class="chart"></div>
       </section>
 
@@ -86,12 +91,12 @@
       </section>
 
       <section aria-label="Alternate routes">
-        <h2 class="section-title gothic">Alternates</h2>
+        <h2 class="section-title">Alternates</h2>
         <div id="alts"></div>
       </section>
 
       <section class="card" aria-label="WhatsApp summary">
-        <h2 class="gothic">Share with the group</h2>
+        <h2 class="section-title in-card">Share with the group</h2>
         <textarea id="wa-text" rows="9" readonly></textarea>
         <div class="btns">
           <button type="button" class="btn primary" id="copy">Copy text</button>
@@ -122,7 +127,7 @@
   </main>
 
   <footer class="wrap foot">
-    <p class="gothic foot-brand">HAWKS Qatar MC &middot; Ride Safe</p>
+    <div class="footbar"><b>HAWKS</b><span class="rule" aria-hidden="true"></span><span class="tagline">united by family</span></div>
     <p>Forecast: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>. Route waypoints are approximate &mdash; always check the road and conditions yourself. Ride safe.</p>
     <p id="generated"></p>
   </footer>

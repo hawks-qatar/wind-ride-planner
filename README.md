@@ -250,6 +250,26 @@ Notes:
 * The page also refreshes the forecast live in the browser, so it stays current
   between scheduled builds.
 
+## Brand (HAWKS Brand Manual 2021 v3)
+
+The page follows the club brand manual:
+
+| | Manual | On the site |
+|---|---|---|
+| HAWKS Red | Pantone P 49-16 C, RGB 175/30/35 | `#AF1E23` |
+| HAWKS Black | Pantone Black CP, RGB 35/31/32 | `#231F20` (cards); pages are black like the manual |
+| Primary font | Godhong Professional | Used if installed on the device; otherwise **Pirata One** (closest free match) |
+| Secondary font | Kohinoor Regular / Bold | **Hind**, the Indian Type Foundry's open web version of Kohinoor |
+| Graphics | Outlined wing, labels with thin rules, red-ruled section titles, "HAWKS ---- n" footer | Same (`site/assets/wing-lines.png` is taken from the manual) |
+| Logo | Official HAWKS Qatar logo | `site/assets/hawks-logo.webp`, the file used unchanged |
+
+**Using the real Godhong font:** Godhong Professional is a commercial font. If the club has a
+web licence, save it as `site/assets/fonts/godhong-professional.woff2` and add
+`, url("assets/fonts/godhong-professional.woff2") format("woff2")` to the `@font-face` rule at the
+top of `site/style.css`.
+
+Green and amber are used only as safety signals (good / caution), not as brand colours.
+
 ## Tests
 
 ```bash
