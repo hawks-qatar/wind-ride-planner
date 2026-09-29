@@ -22,7 +22,7 @@ needed.
 | | |
 |---|---|
 | **Days** | Tuesday = short ride (60–120 km), Saturday = long ride (200–350 km). Any other day can be checked too. |
-| **Ride window** | Saturday 08:00–12:00 and Tuesday 20:00–23:00 Qatar time, matching the club calendar (set in `config.json`). |
+| **Ride time** | Every day can be checked for a **morning** (08:00–12:00) or **evening** (20:00–23:00) ride. Tuesday opens on evening and Saturday on morning, matching the club calendar (set in `config.json`). |
 | **Weather** | [Open-Meteo](https://open-meteo.com/) (free, no key): hourly wind speed, direction, gusts, temperature, visibility. |
 | **Where** | Wind is sampled all along every route (about 36 points on an ~11 km grid), not just Doha, so Al Shamal, Dukhan and Mesaieed are each looked up separately. |
 | **Output** | Recommended route and 2 alternates with plain-English reasons, wind arrow, hourly chart, map, Google Maps link, GPX, WhatsApp text. |
@@ -116,10 +116,11 @@ Useful options:
 ## "Check any day" mode
 
 The page has a date picker, quick buttons (next Tuesday, next Saturday,
-tomorrow) and a Short/Long switch. Links keep the choice (`?date=2026-10-03&type=long`),
-so a shared link opens the same day.
+tomorrow), a Short/Long switch and a Morning/Evening switch. Every day supports both
+times; each day just opens on its usual choice. Links keep the choice
+(`?date=2026-10-03&type=long&time=morning`), so a shared link opens the same ride.
 
-* The scheduled build **prebuilds the next 7 days**.
+* The scheduled build **prebuilds the next 7 days**, every combination (morning/evening × short/long).
 * For other dates (up to Open-Meteo's 16-day limit), or when the saved forecast
   is more than 6 hours old (`live_refresh_after_hours`), the page **fetches Open-Meteo
   directly in the browser** and runs the same scoring in `site/planner.js`.
@@ -170,8 +171,10 @@ coordinates inside Qatar, sensible distances, round trips).
 | Setting | Default | Meaning |
 |---|---|---|
 | `club_name` | `HAWKS Qatar` | Shown in the page header, WhatsApp text and GPX files |
-| `ride_days.*.window` | Tue `20:00`–`23:00`, Sat `08:00`–`12:00` | Ride window (`other_days` for the rest: `08:00`–`12:00`) |
-| `ride_days.*.ride_type` | Tue `short`, Sat `long` | Which route list to use |
+| `sessions.morning.window` | `08:00`–`12:00` | Morning ride window |
+| `sessions.evening.window` | `20:00`–`23:00` | Evening ride window (long evening rides are scored past midnight) |
+| `ride_days.*.session` | Tue `evening`, Sat `morning` | Which time the page opens on for club days (`other_days`: `morning`) |
+| `ride_days.*.ride_type` | Tue `short`, Sat `long` | Which route list the page opens on (`other_days`: `short`) |
 | `average_speed_kmh` | 70 / 75 | Used to estimate when you reach each stretch (include stops) |
 | `thresholds.wind_caution_kmh` | 25 | Average wind above this costs points and triggers "caution" |
 | `thresholds.wind_skip_kmh` | 35 | Above this: unsafe, "skip or ride short" |

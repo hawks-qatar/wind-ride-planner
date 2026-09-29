@@ -172,24 +172,36 @@ def rank(results: list[dict]) -> list[dict]:
                                           -(r["score"] or 0), -r.get("raw_score", 0), r["distance_km"]))
 
 
+SESSIONS = ("morning", "evening")
+
+
+def session_window(session: str, cfg: dict) -> list[str]:
+    return cfg["sessions"][session]["window"]
+
+
 def day_settings(day: date, cfg: dict) -> dict:
-    """Default ride type and window for a date; club days come from config ride_days."""
-    for rd in cfg["ride_days"].values():
-        if rd["weekday"] == day.weekday():
-            return {"ride_type": rd["ride_type"], "window": rd["window"], "club_day": True}
-    other = cfg["other_days"]
-    return {"ride_type": other["ride_type"], "window": other["window"], "club_day": False}
+    """Default ride type and session for a date; club days come from config ride_days."""
+    for key, rd in cfg["ride_days"].items():
+        if not key.startswith("_") and rd["weekday"] == day.weekday():
+            chosen, club = rd, True
+            break
+    else:
+        chosen, club = cfg["other_days"], False
+    return {"ride_type": chosen["ride_type"], "session": chosen["session"],
+            "window": session_window(chosen["session"], cfg), "club_day": club}
 
 
-def plan_day(day: date, ride_type: str, routes: list[dict], legs_by_route: dict, weather: dict, cfg: dict) -> dict:
-    """Score every route of the ride type and pick a recommendation plus alternates."""
-    window = day_settings(day, cfg)["window"]
+def plan_day(day: date, ride_type: str, routes: list[dict], legs_by_route: dict, weather: dict, cfg: dict,
+             session: str | None = None) -> dict:
+    """Score every route of the ride type for a session and pick a recommendation plus alternates."""
+    session = session or day_settings(day, cfg)["session"]
+    window = session_window(session, cfg)
     scored = rank([score_route(r, legs_by_route[r["id"]], weather, day, window, cfg)
                    for r in routes if r["type"] == ride_type])
     usable = [r for r in scored if r["score"] is not None]
     plan = {
         "date": day.isoformat(), "weekday": day.strftime("%A"), "ride_type": ride_type,
-        "window": window, "routes": scored,
+        "session": session, "window": window, "routes": scored,
         "recommended": usable[0] if usable else None,
         "alternates": usable[1:1 + cfg.get("alternates", 2)],
         "hourly": hourly_summary(day, window, usable[0], legs_by_route, weather, cfg) if usable else [],

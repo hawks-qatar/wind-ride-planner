@@ -1,5 +1,5 @@
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -27,10 +27,12 @@ NORTH = {
 
 
 def uniform_weather(keys, wind=20, direction=0, gust=None, temp=30, vis=20000, day=DAY):
-    times = [f"{day.isoformat()}T{h:02d}:00" for h in range(24)]
-    return {k: {"time": times, "wind": [wind] * 24, "dir": [direction] * 24,
-                "gust": [gust if gust is not None else wind * 1.3] * 24,
-                "temp": [temp] * 24, "vis": [vis] * 24} for k in keys}
+    # Two days of hours, like the real build (evening rides can run past midnight).
+    times = [f"{(day + timedelta(days=h // 24)).isoformat()}T{h % 24:02d}:00" for h in range(48)]
+    n = len(times)
+    return {k: {"time": times, "wind": [wind] * n, "dir": [direction] * n,
+                "gust": [gust if gust is not None else wind * 1.3] * n,
+                "temp": [temp] * n, "vis": [vis] * n} for k in keys}
 
 
 def score_north(**kw):
@@ -106,7 +108,7 @@ def test_plan_day_picks_recommendation_and_two_alternates():
     scores = [plan["recommended"]["score"]] + [a["score"] for a in plan["alternates"]]
     assert scores == sorted(scores, reverse=True)
     assert plan["summary"]["wind_dir_compass"] in ("NNW", "NW")
-    start_hour = CFG["ride_days"]["saturday"]["window"][0][:2]
+    start_hour = CFG["sessions"][CFG["ride_days"]["saturday"]["session"]]["window"][0][:2]
     assert plan["hourly"][0]["time"] == f"{start_hour}:00"
 
 
@@ -123,9 +125,31 @@ def test_plan_day_without_data():
 
 
 def test_day_settings_from_config():
-    assert day_settings(date(2026, 9, 29), CFG)["ride_type"] == "short"   # Tuesday
-    assert day_settings(date(2026, 10, 3), CFG)["ride_type"] == "long"    # Saturday
-    assert day_settings(date(2026, 10, 1), CFG)["club_day"] is False     # Thursday
+    tue, sat, thu = (day_settings(d, CFG) for d in (date(2026, 9, 29), date(2026, 10, 3), date(2026, 10, 1)))
+    assert (tue["ride_type"], tue["session"]) == ("short", "evening")
+    assert (sat["ride_type"], sat["session"]) == ("long", "morning")
+    assert thu["club_day"] is False and thu["session"] == "morning"
+    assert tue["window"] == CFG["sessions"]["evening"]["window"]
+
+
+@pytest.mark.parametrize("session", ["morning", "evening"])
+@pytest.mark.parametrize("ride_type", ["short", "long"])
+def test_every_day_supports_both_sessions(session, ride_type):
+    thursday = date(2026, 10, 1)
+    plan = plan_day(thursday, ride_type, ROUTES, LEGS, all_weather(wind=10, day=thursday), CFG, session)
+    assert plan["session"] == session
+    assert plan["window"] == CFG["sessions"][session]["window"]
+    assert plan["recommended"]["type"] == ride_type
+    assert plan["hourly"][0]["time"] == CFG["sessions"][session]["window"][0][:2] + ":00"
+
+
+def test_long_evening_ride_runs_past_midnight():
+    # A long ride starting at 20:00 finishes after midnight; it must still be scored.
+    plan = plan_day(DAY, "long", ROUTES, LEGS, all_weather(wind=10), CFG, "evening")
+    assert plan["status"] != "no_data"
+    assert all(r["score"] is not None for r in plan["routes"])
+    times = [leg["time"] for r in plan["routes"] for leg in r["legs"]]
+    assert times[0] >= "20:00" and any(t < "06:00" for t in times)
 
 
 def test_sample_interpolates_wind_as_vector():
