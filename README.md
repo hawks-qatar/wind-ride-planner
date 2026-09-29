@@ -21,7 +21,7 @@ needed.
 
 | | |
 |---|---|
-| **Days** | Tuesday = short ride (60–120 km), Saturday = long ride (200–350 km). Any other day can be checked too. |
+| **Ride types** | Short ride (60–120 km) or long ride (150–250 km). Tuesday opens on short and Saturday on long; any day can be checked for either. |
 | **Ride time** | Every day can be checked for a **morning** (08:00–12:00) or **evening** (20:00–23:00) ride. Tuesday opens on evening and Saturday on morning, matching the club calendar (set in `config.json`). |
 | **Weather** | [Open-Meteo](https://open-meteo.com/) (free, no key): hourly wind speed, direction, gusts, temperature, visibility. |
 | **Where** | Wind is sampled all along every route (about 36 points on an ~11 km grid), not just Doha, so Al Shamal, Dukhan and Mesaieed are each looked up separately. |

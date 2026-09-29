@@ -20,8 +20,8 @@ def test_route_library_is_valid_and_balanced():
 
 @pytest.mark.parametrize("route", ROUTES, ids=lambda r: r["id"])
 def test_distances_match_ride_type(route):
-    # "about" 60-120 km short and 200-350 km long, with a little slack.
-    lo, hi = (60, 130) if route["type"] == "short" else (200, 350)
+    # Short rides about 60-120 km (a little slack for Mesaieed), long rides 150-250 km.
+    lo, hi = (60, 130) if route["type"] == "short" else (150, 250)
     assert lo <= route["distance_km"] <= hi
 
 

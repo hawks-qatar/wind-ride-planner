@@ -144,8 +144,9 @@ def test_every_day_supports_both_sessions(session, ride_type):
 
 
 def test_long_evening_ride_runs_past_midnight():
-    # A long ride starting at 20:00 finishes after midnight; it must still be scored.
-    plan = plan_day(DAY, "long", ROUTES, LEGS, all_weather(wind=10), CFG, "evening")
+    # At a relaxed pace a long ride starting at 20:00 finishes after midnight; it must still be scored.
+    slow = {**CFG, "average_speed_kmh": {**CFG["average_speed_kmh"], "long": 50}}
+    plan = plan_day(DAY, "long", ROUTES, LEGS, all_weather(wind=10), slow, "evening")
     assert plan["status"] != "no_data"
     assert all(r["score"] is not None for r in plan["routes"])
     times = [leg["time"] for r in plan["routes"] for leg in r["legs"]]
